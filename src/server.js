@@ -27,6 +27,12 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
+// Swagger
+if (process.env.NODE_ENV !== 'production') {
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+}
+
+
 // Rate Limiting
 app.use('/api', apiLimiter);
 
