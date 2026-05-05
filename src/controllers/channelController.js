@@ -88,3 +88,43 @@ export const checkChannelStream = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Recheck all channels stream status
+// @route   POST /api/channels/recheck
+export const recheckAllChannels = async (req, res, next) => {
+  try {
+    const channels = await Channel.find({ isActive: true });
+
+    await Promise.all(
+      channels.map(async (channel) => {
+        try {
+          const streamStatus = await checkStream(channel.streamUrl);
+
+          channel.isOnline = streamStatus.isOnline;
+          channel.latency = streamStatus.latency;
+          channel.lastCheckedAt = new Date();
+
+          await channel.save();
+
+          return {
+            channelId: channel.channelId,
+            success: true,
+            ...streamStatus
+          };
+        } catch (error) {
+          return {
+            channelId: channel.channelId,
+            success: false
+          };
+        }
+      })
+    );
+
+    res.json({
+      success: true,
+      message: 'Recheck completed'
+    });
+  } catch (error) {
+    next(error);
+  }
+};

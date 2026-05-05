@@ -1,5 +1,5 @@
 import express from 'express';
-import { getChannels, getChannelById, getGroups, checkChannelStream } from '../controllers/channelController.js';
+import { getChannels, getChannelById, getGroups, checkChannelStream, recheckAllChannels } from '../controllers/channelController.js';
 
 const router = express.Router();
 
@@ -83,5 +83,18 @@ router.get('/:id', getChannelById);
  *         description: Không tìm thấy kênh
  */
 router.get('/:id/check', checkChannelStream);
+
+/**
+ * @swagger
+ * /api/channels/recheck:
+ *   post:
+ *     summary: Kiểm tra trạng thái stream
+ *     description: Kiểm tra xem link HLS của kênh còn sống (online) hay không
+ *     tags: [Channels]
+ *     responses:
+ *       200:
+ *         description: Trả về trạng thái online và latency
+ */
+router.post('/recheck', recheckAllChannels);
 
 export default router;
