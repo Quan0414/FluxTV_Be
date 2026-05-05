@@ -9,6 +9,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerDocs from './config/swagger.js';
 import { apiLimiter } from './middlewares/rateLimiter.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { startStreamCheckJob } from './services/streamChecker.js';
 
 dotenv.config();
 
@@ -63,4 +64,7 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  
+  // Start the background job to check streams periodically (every 5 minutes)
+  startStreamCheckJob(5 * 60 * 1000);
 });

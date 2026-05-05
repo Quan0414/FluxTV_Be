@@ -30,6 +30,20 @@ const channelSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isOnline: {
+    type: Boolean,
+    default: false
+  },
+
+  latency: {
+    type: Number,
+    default: 0
+  },
+
+  lastCheckedAt: {
+    type: Date,
+    default: null
+  },
   order: {
     type: Number,
     default: 0

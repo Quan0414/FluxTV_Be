@@ -61,7 +61,7 @@ export const getGroups = async (req, res, next) => {
   }
 };
 
-// @desc    Check channel stream status
+// @desc    Check channel stream status (Force Refresh)
 // @route   GET /api/channels/:id/check
 export const checkChannelStream = async (req, res, next) => {
   try {
@@ -72,6 +72,11 @@ export const checkChannelStream = async (req, res, next) => {
     }
 
     const streamStatus = await checkStream(channel.streamUrl);
+
+    channel.isOnline = streamStatus.isOnline;
+    channel.latency = streamStatus.latency;
+    channel.lastCheckedAt = new Date();
+    await channel.save();
     
     res.json({
       success: true,
