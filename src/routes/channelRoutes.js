@@ -82,7 +82,7 @@ router.get('/:id', getChannelById);
  *       404:
  *         description: Không tìm thấy kênh
  */
-router.get('/:id/check', checkChannelStream);
+// router.get('/:id/check', checkChannelStream);
 
 /**
  * @swagger
@@ -95,6 +95,6 @@ router.get('/:id/check', checkChannelStream);
  *       200:
  *         description: Trả về trạng thái online và latency
  */
-router.post('/recheck', recheckAllChannels);
+// router.post('/recheck', recheckAllChannels);
 
 export default router;

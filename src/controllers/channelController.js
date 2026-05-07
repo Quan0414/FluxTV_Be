@@ -1,5 +1,7 @@
 import Channel from '../models/Channel.js';
 import { checkStream } from '../services/streamChecker.js';
+import { StatusCodes } from 'http-status-codes';
+import { successResponse, errorResponse } from '../utils/response.js';
 
 // @desc    Get all channels
 // @route   GET /api/channels
@@ -11,15 +13,14 @@ export const getChannels = async (req, res, next) => {
     if (group) {
       query.group = group;
     }
-    
+
     if (q) {
       query.name = { $regex: q, $options: 'i' };
     }
 
     const channels = await Channel.find(query).sort({ order: 1 });
-    res.json({
-      success: true,
-      total: channels.length,
+    return successResponse(res, {
+      message: 'Channels fetched successfully',
       data: channels
     });
   } catch (error) {
@@ -32,13 +33,16 @@ export const getChannels = async (req, res, next) => {
 export const getChannelById = async (req, res, next) => {
   try {
     const channel = await Channel.findOne({ channelId: req.params.id, isActive: true });
-    
+
     if (!channel) {
-      return res.status(404).json({ success: false, message: 'Channel not found' });
+      return errorResponse(res, {
+        message: 'Channel not found',
+        statusCode: StatusCodes.NOT_FOUND
+      });
     }
 
-    res.json({
-      success: true,
+    return successResponse(res, {
+      message: 'Channel found successfully',
       data: channel
     });
   } catch (error) {
@@ -51,9 +55,8 @@ export const getChannelById = async (req, res, next) => {
 export const getGroups = async (req, res, next) => {
   try {
     const groups = await Channel.distinct('group', { isActive: true });
-    res.json({
-      success: true,
-      total: groups.length,
+    return successResponse(res, {
+      message: 'Groups fetched successfully',
       data: groups
     });
   } catch (error) {
@@ -66,9 +69,12 @@ export const getGroups = async (req, res, next) => {
 export const checkChannelStream = async (req, res, next) => {
   try {
     const channel = await Channel.findOne({ channelId: req.params.id, isActive: true });
-    
+
     if (!channel) {
-      return res.status(404).json({ success: false, message: 'Channel not found' });
+      return errorResponse(res, {
+        message: 'Channel not found',
+        statusCode: StatusCodes.NOT_FOUND
+      });
     }
 
     const streamStatus = await checkStream(channel.streamUrl);
@@ -77,12 +83,14 @@ export const checkChannelStream = async (req, res, next) => {
     channel.latency = streamStatus.latency;
     channel.lastCheckedAt = new Date();
     await channel.save();
-    
-    res.json({
-      success: true,
-      channelId: channel.channelId,
-      ...streamStatus,
-      checkedAt: new Date()
+
+    return successResponse(res, {
+      message: 'Channel checked successfully',
+      data: {
+        channelId: channel.channelId,
+        ...streamStatus,
+        checkedAt: new Date()
+      }
     });
   } catch (error) {
     next(error);
@@ -120,8 +128,7 @@ export const recheckAllChannels = async (req, res, next) => {
       })
     );
 
-    res.json({
-      success: true,
+    return successResponse(res, {
       message: 'Recheck completed'
     });
   } catch (error) {
