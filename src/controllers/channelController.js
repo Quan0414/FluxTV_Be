@@ -21,7 +21,7 @@ export const getChannels = async (req, res, next) => {
     const channels = await Channel.find(query).sort({ order: 1 });
     return successResponse(res, {
       message: 'Channels fetched successfully',
-      data: channels
+      data: { channels }
     });
   } catch (error) {
     next(error);
@@ -43,7 +43,7 @@ export const getChannelById = async (req, res, next) => {
 
     return successResponse(res, {
       message: 'Channel found successfully',
-      data: channel
+      data: { channel }
     });
   } catch (error) {
     next(error);
@@ -57,7 +57,7 @@ export const getGroups = async (req, res, next) => {
     const groups = await Channel.distinct('group', { isActive: true });
     return successResponse(res, {
       message: 'Groups fetched successfully',
-      data: groups
+      data: { groups }
     });
   } catch (error) {
     next(error);
